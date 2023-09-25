@@ -20,8 +20,19 @@ class UserSeeder extends Seeder
             'email' => 'test@abc.com',
             'password' => bcrypt('12345678'),
         ])->roles()
-            ->sync(
-                Role::where('name', RoleName::ADMIN->value)->first()
+            ->attach(
+                Role::whereName(RoleName::ADMIN->value)->first()
+            );
+
+        User::factory(10)
+            ->create([
+                'password' => bcrypt('12345678'),
+                'email_verified_at' => null,
+                'remember_token' => null,
+            ])
+            ->each(
+                fn ($user) => $user->roles()
+                    ->attach(Role::whereName(RoleName::STAFF->value)->first())
             );
     }
 }
