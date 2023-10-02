@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\RoleName;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Collection;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -49,7 +50,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class);
     }
 
-    public function permissions(): array
+    public function permissions(): Collection
     {
         return $this->roles()
             ->with('permissions')
@@ -57,8 +58,7 @@ class User extends Authenticatable
             ->map(fn ($role) => $role->permissions->pluck('name'))
             ->flatten()
             ->unique()
-            ->values()
-            ->toArray();
+            ->values();
     }
 
     public function isAdmin(): bool
