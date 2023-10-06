@@ -24,9 +24,7 @@ class RoleSeeder extends Seeder
     {
         $this->createRole(
             RoleName::ADMIN,
-            Permission::query()
-                ->where('name', 'like', 'user.%')
-                ->pluck('id')
+            Permission::pluck('id')
         );
     }
 
@@ -34,16 +32,13 @@ class RoleSeeder extends Seeder
     {
         $this->createRole(
             RoleName::STAFF,
-            Permission::query()
-                ->whereIn('name', ['user.viewAny', 'user.view', 'user.update'])
-                ->pluck('id')
+            Permission::latest('id')->limit(2)->pluck('id')
         );
     }
 
     protected function createRole(RoleName $roleName, Collection $permissionsId): void
     {
-        Role::create([
-            'name' => $roleName->value,
-        ])->permissions()->sync($permissionsId);
+        Role::create(['name' => $roleName->value])
+            ->permissions()->sync($permissionsId);
     }
 }

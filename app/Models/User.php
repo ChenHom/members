@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\RoleName;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -45,34 +46,48 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public const USER_ROLE_CACHE_KEY = 'user_roles';
+
+    public function cachedRoles(): array
+    {
+        $roles = json_decode(
+            Redis::hGet(static::USER_ROLE_CACHE_KEY, $this->id)
+        );
+
+        return data_get($roles, 'value', []);
+    }
+
+    public function cachedPermissions(): array
+    {
+        foreach ($this->cachedRoles() as $roleName) {
+            $roles[$roleName] = Role::cachedPermissions($roleName);
+        }
+
+        return $roles ?? [];
+    }
+
     public function roles(): BelongsToMany
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class)->using(UserRole::class);
     }
 
     public function permissions(): Collection
     {
-        return $this->roles()
-            ->with('permissions')
-            ->get()
-            ->map(fn ($role) => $role->permissions->pluck('name'))
-            ->flatten()
-            ->unique()
-            ->values();
+        return collect($this->cachedPermissions())->flatten()->unique();
     }
 
     public function isAdmin(): bool
     {
-        return $this->hasRole(RoleName::ADMIN());
+        return $this->hasRole(RoleName::ADMIN);
     }
 
-    public function hasRole(RoleName $roleName): bool
+    public function hasRole(RoleName $name): bool
     {
-        return $this->roles()->where('name', $roleName->value)->exists();
+        return collect($this->cachedRoles())->contains($name->value);
     }
 
     public function hasPermission(string $name): bool
     {
-        return in_array($name, $this->permissions(), true);
+        return $this->permissions()->contains($name);
     }
 }

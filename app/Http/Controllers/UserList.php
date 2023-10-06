@@ -15,8 +15,8 @@ class UserList extends Controller
         return inertia('User/List', [
             'users' => User::when(
                 $request->search,
-                fn ($query, $search) => $query->where('name', 'LIKE', "%${search}%")
-                    ->orWhere('email', 'LIKE', "%${search}%")
+                fn ($query, $search) => $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
             )
                 ->paginate()
         ]);

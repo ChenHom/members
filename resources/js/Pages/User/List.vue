@@ -26,11 +26,12 @@ function searchUser(event: InputEvent) {
         // api 查詢使用者
         router.get(
             route('user.list'),
-            { search }, {
-            onSuccess: ({ props }) => {
-                users.value = props.users as UserPagination;
+            { search },
+            {
+                onSuccess: ({ props }) => {
+                    users.value = props.users as UserPagination;
+                }
             }
-        }
         );
     }, 1000);
 }

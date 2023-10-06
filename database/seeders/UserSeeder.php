@@ -31,8 +31,7 @@ class UserSeeder extends Seeder
                 'remember_token' => null,
             ])
             ->each(
-                fn ($user) => $user->roles()
-                    ->attach(Role::whereName(RoleName::STAFF->value)->first())
+                fn ($user) => $user->roles()->attach(Role::whereName(RoleName::STAFF->value)->first())
             );
     }
 }

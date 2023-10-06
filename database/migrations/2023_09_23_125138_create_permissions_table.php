@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
             $table->string('name')->comment('Permission name');
+            $table->enum('status', ['enabled', 'disabled'])
+                ->default('enabled')
+                ->comment('Permission status');
             $table->datetimes();
         });
     }

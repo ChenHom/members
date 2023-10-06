@@ -14,8 +14,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('role_user', function (Blueprint $table) {
-            $table->foreignIdFor(Role::class)->constrained();
             $table->foreignIdFor(User::class)->constrained();
+            $table->foreignIdFor(Role::class)->constrained();
+
+            $table->unique(['user_id', 'role_id']);
         });
     }
 
