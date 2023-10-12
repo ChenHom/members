@@ -12,6 +12,8 @@ class Permission extends Model
 {
     use HasFactory;
 
+    protected const ALL_PERMISSION_CACHE_KEY = 'all_permissions';
+
     protected $fillable = ['name', 'status'];
 
     protected $casts = [
@@ -27,15 +29,15 @@ class Permission extends Model
                     fn (Role $item) => $item->permissions()->detach($permission)
                 );
 
-                Redis::sRem('all_permissions', $permission->name);
+                Redis::sRem(self::ALL_PERMISSION_CACHE_KEY, $permission->name);
             } else {
-                Redis::sAdd('all_permissions', $permission->name);
+                Redis::sAdd(self::ALL_PERMISSION_CACHE_KEY, $permission->name);
             }
         });
 
         static::created(function (self $permission) {
             if ($permission->isEnabled()) {
-                Redis::sAdd('all_permissions', $permission->name);
+                Redis::sAdd(self::ALL_PERMISSION_CACHE_KEY, $permission->name);
             }
         });
     }
@@ -53,5 +55,10 @@ class Permission extends Model
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class)->using(RolePermission::class);
+    }
+
+    public static function cachedAllPermission(): array
+    {
+        return Redis::sMembers(self::ALL_PERMISSION_CACHE_KEY) ?? [];
     }
 }

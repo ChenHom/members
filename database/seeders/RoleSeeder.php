@@ -32,7 +32,7 @@ class RoleSeeder extends Seeder
     {
         $this->createRole(
             RoleName::STAFF,
-            Permission::latest('id')->limit(2)->pluck('id')
+            Permission::where('name', 'like', 'user.view%')->pluck('id')
         );
     }
 

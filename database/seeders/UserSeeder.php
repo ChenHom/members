@@ -15,11 +15,12 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Leonardo Gomes',
-            'email' => 'test@abc.com',
-            'password' => bcrypt('12345678'),
-        ])->roles()
+        User::factory()
+            ->create([
+                'name' => 'Leonardo Gomes',
+                'email' => 'test@abc.com',
+                'password' => bcrypt('12345678'),
+            ])->roles()
             ->attach(
                 Role::whereName(RoleName::ADMIN->value)->first()
             );

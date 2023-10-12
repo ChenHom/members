@@ -1,20 +1,10 @@
-// import { usePage } from "@inertiajs/vue3";
+let permissions: { [key: string]: number } = {}
 
-
-// const permissions = usePage().props.auth.permissions.reduce((obj, item) => {
-//     obj[item] = true;
-//     return obj;
-// }, {} as { [key: string]: boolean });
-// console.log( usePage().props);
-
-const permissions: { [key: string]: boolean } = {}
 export default {
-    fillPermissions(per: string[]) {
-        per.forEach((item) => {
-            permissions[item] = true;
-        });
+    fillPermissions(per: { [key: string]: number}) {
+      permissions = per;
     },
-    can: (permission: string) => !!permissions[permission],
+    can: (permission: string) => permissions.hasOwnProperty(permission),
 
-    cant: (permission: string) => !permissions[permission],
+    cant: (permission: string) => !permissions.hasOwnProperty(permission),
 };

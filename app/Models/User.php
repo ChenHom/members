@@ -50,30 +50,21 @@ class User extends Authenticatable
 
     public function cachedRoles(): array
     {
-        $roles = json_decode(
-            Redis::hGet(static::USER_ROLE_CACHE_KEY, $this->id)
-        );
-
-        return data_get($roles, 'value', []);
+        return Redis::sMembers(static::USER_ROLE_CACHE_KEY. '_' . $this->id) ?? [];
     }
 
-    public function cachedPermissions(): array
+    public function cachedPermissions(): Collection
     {
         foreach ($this->cachedRoles() as $roleName) {
-            $roles[$roleName] = Role::cachedPermissions($roleName);
+            $roles[] = Role::cachedPermissions($roleName);
         }
 
-        return $roles ?? [];
+        return collect($roles)->flatten()->flip();
     }
 
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class)->using(UserRole::class);
-    }
-
-    public function permissions(): Collection
-    {
-        return collect($this->cachedPermissions())->flatten()->unique();
     }
 
     public function isAdmin(): bool
@@ -83,11 +74,11 @@ class User extends Authenticatable
 
     public function hasRole(RoleName $name): bool
     {
-        return collect($this->cachedRoles())->contains($name->value);
+        return in_array($name->value, $this->cachedRoles());
     }
 
     public function hasPermission(string $name): bool
     {
-        return $this->permissions()->contains($name);
+        return $this->cachedPermissions()->has($name);
     }
 }

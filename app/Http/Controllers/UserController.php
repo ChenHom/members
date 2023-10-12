@@ -5,12 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 
-class UserList extends Controller
+class UserController extends Controller
 {
-    /**
-     * Handle the incoming request.
-     */
-    public function __invoke(Request $request)
+    public function list(Request $request)
     {
         return inertia('User/List', [
             'users' => User::when(
@@ -20,5 +17,16 @@ class UserList extends Controller
             )
                 ->paginate()
         ]);
+    }
+
+    public function update(User $user, Request $request)
+    {
+        $pareUpdate = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'position' => 'required|string|max:255',
+            'telephone' => 'required|string|min:9|max:15',
+        ]);
+
+        $user->update($pareUpdate);
     }
 }

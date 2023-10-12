@@ -13,23 +13,18 @@ class UserRole extends Pivot
      */
     protected static function booted(): void
     {
-        static::created(fn (self $pivot) => $pivot->freshUserRoleCache());
-        static::deleted(fn (self $pivot) => $pivot->freshUserRoleCache());
+        static::created(fn (self $pivot) => Redis::sAdd(
+            User::USER_ROLE_CACHE_KEY . '_' . $pivot->user_id,
+            $pivot->role->name->value
+        ));
+        static::deleted(fn (self $pivot) => Redis::sRem(
+            User::USER_ROLE_CACHE_KEY . '_' . $pivot->user_id,
+            $pivot->role->name->value
+        ));
     }
 
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
-    }
-
-    protected function freshUserRoleCache(): void
-    {
-        Redis::hSet(
-            User::USER_ROLE_CACHE_KEY,
-            $this->pivotParent->id,
-            json_encode([
-                'value' => $this->pivotParent->roles()->pluck('name')->all(),
-            ])
-        );
     }
 }

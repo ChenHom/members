@@ -31,12 +31,12 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerPermissions(): void
     {
         try {
-            Permission::pluck('name')->each(
-                fn ($permission) => Gate::define(
+            foreach (Permission::cachedAllPermission() as $permission) {
+                Gate::define(
                     $permission,
                     fn (User $user) => $user->hasPermission($permission)
-                )
-            );
+                );
+            }
         } catch (\Throwable $th) {
             info('權限註冊: 在資料庫中沒有找到權限資料，應用程式將會略過使用者權限審查功能。');
         }
