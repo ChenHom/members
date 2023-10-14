@@ -29,4 +29,9 @@ export type PageProps<T extends Record<string, unknown> = Record<string, unknown
     user: User;
     permissions: { [key: string]: number };
   };
+  flash: {
+    success?: string;
+    message?: string;
+    error?: string;
+  };
 };

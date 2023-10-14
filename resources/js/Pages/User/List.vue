@@ -68,9 +68,8 @@ function updateUser(e: Event) {
     },
     {
       preserveScroll: true,
-      onSuccess: () => {
-        alert('更新成功')
-        window.location.reload();
+      onSuccess: (response) => {
+        console.log(response)
       }
     }
   );
@@ -228,8 +227,9 @@ onMounted(() => {
                         <input type="text" name="name" id="name"
                           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           placeholder="Bonnie" v-model="showUser.name" required>
-                          <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.name" v-text="$page.props.errors.name">
-                          </div>
+                        <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.name"
+                          v-text="$page.props.errors.name">
+                        </div>
                       </div>
                       <div class="col-span-6 sm:col-span-3">
                         <label for="position"
@@ -237,8 +237,9 @@ onMounted(() => {
                         <input type="text" name="position" id="position"
                           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           placeholder="Engineer" v-model="showUser.position">
-                          <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.position" v-text="$page.props.errors.position">
-                          </div>
+                        <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.position"
+                          v-text="$page.props.errors.position">
+                        </div>
                       </div>
                       <div class="col-span-6 sm:col-span-3">
                         <label for="email"
@@ -254,8 +255,9 @@ onMounted(() => {
                         <input type="text" name="phone-number" id="phone-number"
                           class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-600 focus:border-blue-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                           placeholder="e.g. +123456789" v-model="showUser.telephone">
-                          <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.telephone" v-text="$page.props.errors.telephone">
-                          </div>
+                        <div class="mt-1 text-xs text-red-800" v-show="$page.props.errors.telephone"
+                          v-text="$page.props.errors.telephone">
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -264,6 +266,8 @@ onMounted(() => {
                     <button type="submit" v-if="permission.can('user.update')" @click="updateUser"
                       class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Update
                       User</button>
+                    <div class="mt-1 text-xs text-green-500" v-show="$page.props.flash.success"
+                      v-text="$page.props.flash.success"></div>
                   </div>
                 </form>
               </div>
@@ -273,5 +277,4 @@ onMounted(() => {
         </div>
       </div>
     </div>
-  </AuthenticatedLayout>
-</template>
+</AuthenticatedLayout></template>

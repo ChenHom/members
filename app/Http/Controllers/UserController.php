@@ -28,5 +28,7 @@ class UserController extends Controller
         ]);
 
         $user->update($pareUpdate);
+
+        return back()->with('success', 'User updated.');
     }
 }
